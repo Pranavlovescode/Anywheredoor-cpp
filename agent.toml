@@ -1,0 +1,39 @@
+# AnyWhereDoor agent config
+agent_id = ""   # leave empty — auto-generated on first run
+
+[[watch]]
+path      = "C:/coding_playground/Anywheredoor"
+recursive = true
+ignore    = ["*.tmp", "*.swp", ".git", "node_modules"]
+
+[[watch]]
+path      = "C:/coding_playground/cp"
+recursive = true
+ignore    = ["build/", "*.o", "*.a"]
+
+[server]
+host           = "sync.yourdomain.com"
+port           = 443
+use_tls        = true
+api_base_path  = "/api/v1"
+agent_token    = "$env"   # set AWD_AGENT_TOKEN in your environment
+
+[crypto]
+key_store_path      = "C:/coding_playground/Anywheredoor/.awd/keys.dat"
+key_derivation_salt = "a3f8c2d1..."   # generate once: openssl rand -hex 32
+zero_knowledge      = true
+chunk_size_bytes    = 1048576         # 1 MiB
+
+[transport]
+connect_timeout_ms         = 5000
+read_timeout_ms            = 30000
+max_retries_before_journal = 3
+retry_backoff_base_ms      = 500
+max_backoff_ms             = 30000
+prefer_websocket           = true
+
+[logging]
+level            = "info"
+file_path        = "C:/coding_playground/Anywheredoor/.awd/agent.log"
+rotate_daily     = true
+max_file_size_mb = 10
