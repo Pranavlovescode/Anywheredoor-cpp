@@ -40,13 +40,24 @@ namespace awd{
         uint32_t    maxFileSizeMb{10};
     };
 
+    struct CryptoConfig {
+        std::string  keyStorePath;          // path to encrypted key store file
+        std::string  salt;     // hex-encoded salt (stored in config)
+        bool         zeroKnowledge{true};   // server never sees plaintext
+        uint32_t     chunkSizeBytes{1 << 20}; // 1 MiB default CDC chunk target
+    };
+
     struct AgentConfig {
         std::string agentId;
         std::vector<WatchEntry> watchEntries;
         ServerConfig serverConfig;
         LoggingConfig loggingConfig;
         TransportConfig transportConfig;
+        CryptoConfig crypto;
     };
+
+
+
 
     class AgentConfigLoader {
     public:
@@ -63,6 +74,7 @@ namespace awd{
         static TransportConfig parseTransportConfig(const void* tomlTable);
         static LoggingConfig   parseLoggingConfig(const void* tomlTable);
         static std::string generateAgentId();
+        static CryptoConfig parseCryptoConfig(const void* tomlTable);
     };
 }
 

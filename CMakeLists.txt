@@ -27,6 +27,8 @@ add_executable(Anywheredoor
         src/main.cpp
         src/core/AgentConfig.cpp
         src/core/AgentConfig.h
+        src/core/EventLoop.cpp
+        src/core/EventLoop.h
 )
 # After add_executable(...)
 configure_file(

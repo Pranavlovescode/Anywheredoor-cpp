@@ -78,17 +78,17 @@ namespace awd {
         return cfg;
     }
 
-    // CryptoConfig AgentConfigLoader::parseCryptoConfig(const void* rawTable)
-    // {
-    //     const auto& tbl = *static_cast<const toml::table*>(rawTable);
-    //
-    //     CryptoConfig cfg;
-    //     cfg.keyStorePath       = tomlGet<std::string>(tbl, "key_store_path",  "~/.awd/keys.dat");
-    //     cfg.keyDerivationSalt  = tomlGet<std::string>(tbl, "key_derivation_salt", "");
-    //     cfg.zeroKnowledge      = tomlGet<bool>       (tbl, "zero_knowledge",  true);
-    //     cfg.chunkSizeBytes     = tomlGet<uint32_t>   (tbl, "chunk_size_bytes",1 << 20);
-    //     return cfg;
-    // }
+    CryptoConfig AgentConfigLoader::parseCryptoConfig(const void* rawTable)
+    {
+        const auto& tbl = *static_cast<const toml::table*>(rawTable);
+
+        CryptoConfig cfg;
+        cfg.keyStorePath       = tomlGet<std::string>(tbl, "key_store_path",  "~/.awd/keys.dat");
+        cfg.salt  = tomlGet<std::string>(tbl, "key_derivation_salt", "");
+        cfg.zeroKnowledge      = tomlGet<bool>       (tbl, "zero_knowledge",  true);
+        cfg.chunkSizeBytes     = tomlGet<uint32_t>   (tbl, "chunk_size_bytes",1 << 20);
+        return cfg;
+    }
 
     TransportConfig AgentConfigLoader::parseTransportConfig(const void* rawTable)
     {
@@ -152,8 +152,8 @@ namespace awd {
         if (auto* tbl = root["server"].as_table())
             config.serverConfig = parseServerConfig(tbl);
 
-        // if (auto* tbl = root["crypto"].as_table())
-        //     config.crypto = parseCryptoConfig(tbl);
+        if (auto* tbl = root["crypto"].as_table())
+            config.crypto = parseCryptoConfig(tbl);
 
         if (auto* tbl = root["transport"].as_table())
             config.transportConfig = parseTransportConfig(tbl);
@@ -200,11 +200,11 @@ namespace awd {
             << "use_tls        = "   << (cfg.serverConfig.useTLS ? "true":"false") << "\n"
             << "agent_token    = \"$env\"\n\n"; // never write token to disk
 
-        // out << "[crypto]\n"
-        //     << "key_store_path      = \"" << cfg.crypto.keyStorePath       << "\"\n"
-        //     << "key_derivation_salt = \"" << cfg.crypto.keyDerivationSalt  << "\"\n"
-        //     << "zero_knowledge      = "   << (cfg.crypto.zeroKnowledge ? "true":"false") << "\n"
-        //     << "chunk_size_bytes    = "   << cfg.crypto.chunkSizeBytes      << "\n\n";
+        out << "[crypto]\n"
+            << "key_store_path      = \"" << cfg.crypto.keyStorePath       << "\"\n"
+            << "key_derivation_salt = \"" << cfg.crypto.salt  << "\"\n"
+            << "zero_knowledge      = "   << (cfg.crypto.zeroKnowledge ? "true":"false") << "\n"
+            << "chunk_size_bytes    = "   << cfg.crypto.chunkSizeBytes      << "\n\n";
 
         out << "[transport]\n"
             << "connect_timeout_ms         = " << cfg.transportConfig.connectTimeoutMs        << "\n"
@@ -271,7 +271,7 @@ namespace awd {
         if (!levelOk)
             throw std::runtime_error("[AgentConfig] logging.level must be one of: trace, debug, info, warn, error.");
 
-        // if (config.crypto.chunkSizeBytes < 65536)
-        //     throw std::runtime_error("[AgentConfig] crypto.chunk_size_bytes must be >= 65536 (64 KiB).");
+        if (config.crypto.chunkSizeBytes < 65536)
+            throw std::runtime_error("[AgentConfig] crypto.chunk_size_bytes must be >= 65536 (64 KiB).");
     }
 }
