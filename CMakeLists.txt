@@ -29,6 +29,11 @@ add_executable(Anywheredoor
         src/core/AgentConfig.h
         src/core/EventLoop.cpp
         src/core/EventLoop.h
+        src/filesystem/WinWatcher.cpp
+        src/filesystem/IFileWatcher.h
+        src/core/SyncQueue.cpp
+        src/core/SyncQueue.h
+        src/filesystem/WinWatcher.h
 )
 # After add_executable(...)
 configure_file(

@@ -3,13 +3,19 @@
 //
 
 #include "EventLoop.h"
-
-#include <algorithm>
-#include <condition_variable>
+#include "spdlog/spdlog.h"
 
 namespace event {
-    std::condition_variable cv;
-    std::atomic<bool> running{true};
+
+    EventLoop::EventLoop() {
+        running = true;
+        loop_thread = std::thread(&EventLoop::loop, this);
+    }
+
+    EventLoop::~EventLoop() {
+        stop();
+        wait();
+    }
     void EventLoop::loop() {
         while (running) {
             Task task;
@@ -24,18 +30,18 @@ namespace event {
                 task = event_queue.front();
                 event_queue.pop();
             }
+            spdlog::info("[EventLoop] Running task: {}", task.name);
             // calling the callback function of the task
-            if (task.callback_fun) {
-                task.callback_fun();
-            } else {
-                // No tasks, sleep briefly to avoid busy-waiting
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            try {
+                if (task.callback_fun) task.callback_fun();
+            } catch (const std::exception& e) {
+                spdlog::error("[EventLoop] Task '{}' threw: {}", task.name, e.what());
             }
+            spdlog::info("[EventLoop] Completed task: {}", task.name);
         }
     }
 
     void EventLoop::schedule(const Task& task) {
-
         {
             std::lock_guard<std::mutex> lock(queue_mutex);
             event_queue.push(task);
@@ -54,7 +60,4 @@ namespace event {
         cv.notify_all();
     }
 
-    void EventLoop::start() {
-        loop_thread = std::thread(&EventLoop::loop, this);
-    }
 } // event

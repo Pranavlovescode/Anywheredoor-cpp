@@ -1,0 +1,16 @@
+hello world
+This is a simple text
+file that contains the phrase "hello world".
+It is often used as a basic example in programming and computer science to demonstrate how to output text to the console or display
+it on a screen. The phrase "hello world" has become a standard first program for beginners learning a
+new programming language, as it is easy to understand and serves as a simple introduction to coding concepts.
+
+this some what working as per required.
+this is also checking the file is present or not and if not then it will create the file and write the data into it.
+if the file is already present then it will read the data from the file and print it on
+
+the console. This is a common practice in programming to ensure that the necessary files are
+available before attempting to read or write data to them.
+It helps to prevent errors and ensures that the program runs smoothly.
+
+Also figuring out why this is not logging.....

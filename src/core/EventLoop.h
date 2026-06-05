@@ -5,6 +5,7 @@
 #ifndef ANYWHEREDOOR_EVENTLOOP_H
 #define ANYWHEREDOOR_EVENTLOOP_H
 
+#include <condition_variable>
 #include <functional>
 #include <queue>
 #include <mutex>
@@ -21,18 +22,21 @@ namespace event {
     class EventLoop {
 
     public:
+        EventLoop();
+        ~EventLoop();
         void schedule(const Task& task);
-        void loop();
         void wait();
         void stop();
-        void start();
     private:
         /**
          * A simple thread-safe queue to hold scheduled tasks. In a production implementation, you might want to use a more robust concurrent queue or add condition variables for better efficiency.
          */
+        void loop();
         std::queue<Task> event_queue;
         std::thread loop_thread;
         std::mutex queue_mutex;
+        std::condition_variable cv;
+        std::atomic<bool> running;
     };
 } // namespace event
 
